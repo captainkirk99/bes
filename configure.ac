@@ -724,6 +724,26 @@ AC_SUBST([HDFEOS2_LDFLAGS])
 AC_SUBST([HDFEOS2_LIBS])
 AC_SUBST([HDFEOS2_DIR])
 
+if test  -n "$HDFEOS2_DIR"; then
+  AC_MSG_CHECKING([Is HDFEOS2 is version 20])
+  OLD_CPPFLAGS=$CPPFLAGS
+  CPPFLAGS="$CPPFLAGS $HDFEOS2_CPPFLAGS $HDF4_CFLAGS"
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+#include <mfhdf.h>
+#include <hdf.h>
+#include <HdfEosDef.h>
+]], [[
+#ifndef ICHECKNAME 
+      choke me
+#endif
+  ]])], [hdfeos2_20=yes], [hdfeos2_20=no])
+  AC_MSG_RESULT([$hdfeos2_20])
+  CPPFLAGS=$OLD_CPPFLAGS  
+fi
+if test "x$hdfeos2_20" = xyes; then
+  AC_DEFINE([HDFEOS_CONST_CHAR_PARAMS], [1], [if true, HDFEOS2 uses const char * in function parameters])
+fi
+
 dnl HDF5 tests; We pass null for the tird argument - the interface number
 AC_CHECK_HDF5(
   [AM_CONDITIONAL([BUILD_HDF5],[true])
